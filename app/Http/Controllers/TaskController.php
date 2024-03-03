@@ -9,6 +9,7 @@ use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\Exception\Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+
 class TaskController extends Controller
 {
     private $taskService;
@@ -29,7 +30,7 @@ class TaskController extends Controller
                 'status'    => 200,
                 'data'      => $tasks,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status'    => 500,
                 'error'     => $e->getMessage(),
@@ -63,28 +64,30 @@ class TaskController extends Controller
                 'status'    => 201,
                 'data'      => $task,
             ]);
-        } catch (InvalidArgumentException $e) {
-            return response()->json([
-                'status'    => 422,
-                'error'     => $e->getMessage(),
-            ]);
+        } catch (\InvalidArgumentException $e) {
+            // Check if the exception is indeed an InvalidArgumentException
+                    return response()->json([
+                           'status' => 422,
+                           'error' => $e->getMessage(),
+                    ]);
         }
 	}
 
+
     public function updateTask(Request $request)
-	{
+    {
         $data = $request->only(["_id", "title", "description"]);
 
         try {
-		    $task = $this->taskService->update($data);
-		    return response()->json([
+            $this->taskService->update($data);
+            return response()->json([
                 'status'    => 200,
                 'data'      => 'Data updated successfully.',
             ]);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             return response()->json([
-                'status'    => 422,
-                'error'     => $e->getMessage(),
+                'status' => 422,
+                'error' => $e->getMessage(),
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -92,12 +95,12 @@ class TaskController extends Controller
                 'error'     => $e->getMessage(),
             ]);
         }
-	}
+    }
 
     public function deleteTask($id)
 	{
         try {
-            $task = $this->taskService->delete($id);
+            $this->taskService->delete($id);
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Data deleted successfully.',
@@ -113,7 +116,7 @@ class TaskController extends Controller
     public function doTask($id)
     {
         try {
-		    $task = $this->taskService->updateStatus($id, true);
+		    $this->taskService->updateStatus($id, true);
 		    return response()->json([
                 'status'    => 200,
                 'data'      => 'Data updated successfully.',
@@ -129,7 +132,7 @@ class TaskController extends Controller
     public function undoTask($id)
     {
         try {
-		    $task = $this->taskService->updateStatus($id, false);
+		    $this->taskService->updateStatus($id, false);
 		    return response()->json([
                 'status'    => 200,
                 'data'      => 'Data updated successfully.',
